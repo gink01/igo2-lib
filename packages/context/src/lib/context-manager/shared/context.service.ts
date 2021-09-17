@@ -16,6 +16,7 @@ import {
 import olPoint from 'ol/geom/Point';
 import GeoJSON from 'ol/format/GeoJSON';
 import Cluster from 'ol/source/Cluster';
+import olVectorSource from 'ol/source/Vector';
 
 import { Tool } from '@igo2/common';
 import { uuid, ObjectUtils } from '@igo2/utils';
@@ -562,7 +563,7 @@ export class ContextService {
         };
         context.layers.push(opts);
       } else {
-        if (layer.ol.type !== 'VECTOR') {
+        if (!(layer.ol.getSource() instanceof olVectorSource)) {
           const catalogLayer = layer.options;
           catalogLayer.zIndex = layer.zIndex;
           delete catalogLayer.source;
@@ -571,21 +572,22 @@ export class ContextService {
           let features;
           const writer = new GeoJSON();
           if (layer.ol.getSource() instanceof Cluster) {
+            const clusterSource = layer.ol.getSource() as Cluster;
             features = writer.writeFeatures(
-              layer.ol.getSource().getSource().getFeatures(),
+              clusterSource.getFeatures(),
               {
                 dataProjection: 'EPSG:4326',
                 featureProjection: 'EPSG:3857'
               }
             );
           } else {
-            features = writer.writeFeatures(
-              layer.ol.getSource().getFeatures(),
-              {
-                dataProjection: 'EPSG:4326',
-                featureProjection: 'EPSG:3857'
-              }
-            );
+          //   features = writer.writeFeatures(
+          //     layer.ol.getSource().getFeatures(),
+          //     {
+          //       dataProjection: 'EPSG:4326',
+          //       featureProjection: 'EPSG:3857'
+          //     }
+          //   );
           }
           features = JSON.parse(features);
           features.name = layer.options.title;
