@@ -523,13 +523,20 @@ export class EntityTableComponent implements OnInit, OnChanges, OnDestroy {
    */
   getValue(record: EntityRecord<object>, column: EntityTableColumn): any {
     const entity = record.entity;
+    let value;
     if (column.valueAccessor !== undefined) {
       return column.valueAccessor(entity, record);
     }
     if (this.template.valueAccessor !== undefined) {
       return this.template.valueAccessor(entity, column.name, record);
     }
-    return this.store.getProperty(entity, column.name);
+    value = this.store.getProperty(entity, column.name);
+
+    if (column.type === 'boolean' && !record.edition) {
+
+      value = value ? '&#10003;' : '';  // check mark
+    }
+    return value;
   }
 
   getValidationAttributeValue(column: EntityTableColumn, validationType: string): any {
@@ -641,6 +648,10 @@ export class EntityTableComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     return errorMessages;
+  }
+
+  public isEdition(record) {
+    return record.entity.edition ? true : false;
   }
 
 }

@@ -13,6 +13,7 @@ export interface EntityState {
 }
 
 export interface EntityRecord<E extends object, S extends EntityState = EntityState> {
+  edition?: boolean;
   entity: E;
   state: S;
   revision: number;
@@ -106,12 +107,14 @@ export interface EntityTableColumn {
   valueAccessor?: (entity: object, record: EntityRecord<object>) => any;
   visible?: boolean;
   sort?: boolean;
+  type?: string;
   cellClassFunc?: (entity: object, record: EntityRecord<object>) => {
     [key: string]: boolean;
   };
 }
 
 export interface EntityTableButton {
+  editMode?: boolean;
   icon: string;
   click: (entity: object, record: EntityRecord<object>) => void;
   color?: 'primary' | 'accent' | 'warn';

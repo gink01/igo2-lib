@@ -61,21 +61,7 @@
                 </ng-container>
                 <ng-container *ngIf="columnRenderer === entityTableColumnRenderer.UnsanitizedHTML">
                     <ng-container *matCellDef="let record">
-                        <td mat-cell class="mat-cell-text" *ngIf="!isUrl(getValue(record, column));else isAnUrlUnsanitizedHTML" [ngClass]="getCellClass(record, column)" [innerHTML]="getValue(record, column) | sanitizeHtml">
-                        </td>
-                        <ng-template #isAnUrlUnsanitizedHTML>
-                            <td mat-cell class="mat-cell-text" [ngClass]="getCellClass(record, column)">
-                                <a href="{{getValue(record, column)}}" target='_blank' rel="noopener noreferrer" (click)="$event.stopPropagation()">
-                                    <img *ngIf="isImg(getValue(record, column));else notImg" src="{{(getValue(record, column) | secureImage) | async}}" width="50" heigth="auto">
-                                    <ng-template #notImg><span>{{ 'igo.geo.targetHtmlUrl' | translate }} </span></ng-template>
-                                </a>
-                            </td>
-                        </ng-template>
-                    </ng-container>
-                </ng-container>
-                <ng-container *ngIf="columnRenderer === entityTableColumnRenderer.Editable && formGroup">
-                    <ng-container *matCellDef="let record">
-                        <td mat-cell class="mat-cell-text" [formGroup]="formGroup">
+                        <td mat-cell class="mat-cell-text" [formGroup]="formGroup" *ngIf="isEdition(record);else islUnsanitizedHTML">
                             <div class="date-picker" *ngIf="column.type === 'date'">
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                 <input matInput [matDatepicker]="picker" [formControlName]="column.name">
@@ -83,12 +69,17 @@
                             </div>
                             <input matInput type="time" *ngIf="column.type === 'time'" [formControlName]="column.name" step="900" (focus)="column.onFocus($event)" (keypress)="column.onChange($event)" (blur)="column.onBlur($event)">
                             <input matInput type="number" *ngIf="column.type === 'number'" [formControlName]="column.name" value="{{getValue(record, column)}}" (click)="onValueChange(column.name, record, $event)" readonly="{{getValidationAttributeValue(column, 'readonly')}}" required="{{getValidationAttributeValue(column, 'mandatory')}}">
-                            <input matInput type="text" *ngIf="!column.type || column.type === 'string'" [formControlName]="column.name" value="{{getValue(record, column)}}" (keypress)="onValueChange(column.name, record, $event)" readonly="{{getValidationAttributeValue(column, 'readonly')}}" required="{{getValidationAttributeValue(column, 'mandatory')}}">
+                            <input matInput type="text" *ngIf="!column.type || column.type === 'string'" [formControlName]="column.name" value="{{getValue(record, column)}}" (keypress)="onValueChange(column.name, record, $event)" readonly="{{getValidationAttributeValue(column, 'readonly')}}"
+                                required="{{getValidationAttributeValue(column, 'mandatory')}}">
                             <mat-checkbox *ngIf="column.type === 'boolean'" [formControlName]="column.name" checked="{{getValue(record, column)}}" (change)="onBooleanValueChange(column.name, record, $event)"></mat-checkbox>
                             <ng-container *ngFor="let validation of getErrors(column.name)" ngProjectAs="mat-error">
                                 <mat-error>{{ validation }}</mat-error>
                             </ng-container>
                         </td>
+                        <ng-template #islUnsanitizedHTML>
+                            <td mat-cell class="mat-cell-text" [ngClass]="getCellClass(record, column)" [innerHTML]="getValue(record, column) | sanitizeHtml">
+                            </td>
+                        </ng-template>
                     </ng-container>
                 </ng-container>
                 <ng-container *ngIf="columnRenderer === entityTableColumnRenderer.Icon">
@@ -97,8 +88,10 @@
                     </td>
                 </ng-container>
                 <ng-container *ngIf="columnRenderer === entityTableColumnRenderer.ButtonGroup">
-                    <td mat-cell *matCellDef="let record" class="mat-cell-text" [ngClass]="getCellClass(record, column)">
-                        <span *ngFor="let button of getValue(record, column)">
+                    <ng-container *matCellDef="let record">
+                        <td mat-cell class="mat-cell-text" [ngClass]="getCellClass(record, column)">
+                            <span *ngFor="let button of getValue(record, column)">
+                              <ng-container  *ngIf="isEdition(record) === button.editMode">
                 <button *ngIf="button.style === 'mat-icon-button'"
                   igoStopPropagation
                   mat-icon-button
@@ -113,8 +106,10 @@
                   (click)="onButtonClick(button.click, record)">
                   <mat-icon svgIcon="{{button.icon}}"></mat-icon>
                 </button>
+                </ng-container>
               </span>
-                    </td>
+                        </td>
+                    </ng-container>
                 </ng-container>
             </ng-container>
         </ng-container>
