@@ -61,7 +61,7 @@
                 </ng-container>
                 <ng-container *ngIf="columnRenderer === entityTableColumnRenderer.UnsanitizedHTML">
                     <ng-container *matCellDef="let record">
-                        <td mat-cell class="mat-cell-text" [formGroup]="formGroup" *ngIf="isEdition(record);else islUnsanitizedHTML">
+                        <td mat-cell class="mat-cell-text" [formGroup]="formGroup" *ngIf="isEdition(record);else isUnsanitizedHTML">
                             <div class="date-picker" *ngIf="column.type === 'date'">
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                 <input matInput [matDatepicker]="picker" [formControlName]="column.name">
@@ -76,9 +76,17 @@
                                 <mat-error>{{ validation }}</mat-error>
                             </ng-container>
                         </td>
-                        <ng-template #islUnsanitizedHTML>
-                            <td mat-cell class="mat-cell-text" [ngClass]="getCellClass(record, column)" [innerHTML]="getValue(record, column) | sanitizeHtml">
+                        <ng-template #isUnsanitizedHTML>
+                            <td mat-cell class="mat-cell-text" *ngIf="!isUrl(getValue(record, column));else isAnUrlUnsanitizedHTML" [ngClass]="getCellClass(record, column)" [innerHTML]="getValue(record, column) | sanitizeHtml">
                             </td>
+                            <ng-template #isAnUrlUnsanitizedHTML>
+                                <td mat-cell class="mat-cell-text" [ngClass]="getCellClass(record, column)">
+                                    <a href="{{getValue(record, column)}}" target='_blank' rel="noopener noreferrer" (click)="$event.stopPropagation()">
+                                        <img *ngIf="isImg(getValue(record, column));else notImg" src="{{(getValue(record, column) | secureImage) | async}}" width="50" heigth="auto">
+                                        <ng-template #notImg><span>{{ 'igo.geo.targetHtmlUrl' | translate }} </span></ng-template>
+                                    </a>
+                                </td>
+                            </ng-template>
                         </ng-template>
                     </ng-container>
                 </ng-container>

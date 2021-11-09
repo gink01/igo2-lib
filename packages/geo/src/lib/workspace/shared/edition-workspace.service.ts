@@ -207,7 +207,7 @@ export class EditionWorkspaceService {
           editMode: false,
           icon: 'pencil',
           color: 'primary',
-          click: (feature) => { workspace.editionFeature(feature, workspace) }
+          click: (feature) => { workspace.editFeature(feature, workspace) }
         },
         {
           editMode: false,
@@ -225,7 +225,7 @@ export class EditionWorkspaceService {
                 editMode: true,
                 icon: 'alpha-x',
                 color: 'primary',
-                click: (feature) => { this.cancelEdit(workspace, layer, feature, add) }
+                click: (feature) => { this.cancelEdit(workspace, layer, feature) }
               }] as EntityTableButton[];
       }
     },];
@@ -265,6 +265,12 @@ export class EditionWorkspaceService {
         title: field.alias ? field.alias : field.name,
         renderer: rendererType,
         valueAccessor: undefined,
+        cellClassFunc: () => {
+          if (field.type) {
+            const classCss = `class_${field.type}`;
+            return { classCss : true };
+        }
+        },
         primary: field.primary === true ? true : false,
         visible: field.visible,
         validation: field.validation,
@@ -281,7 +287,10 @@ export class EditionWorkspaceService {
         icon: relation.icon,
         parent: relation.parent,
         type: 'relation',
-        onClick: () => { this.ws$.next(relation.title)}
+        onClick: () => { this.ws$.next(relation.title)},
+        cellClassFunc: () => {
+            return { 'class_icon': true };
+        }
       };
     });
 
@@ -388,9 +397,9 @@ export class EditionWorkspaceService {
     }
   }
 
-  cancelEdit(workspace, layer, feature, add?){
+  cancelEdit(workspace, layer, feature){
     feature.edition = false;
-    if (add) {
+    if (feature.new) {
       workspace.entityStore.delete(feature);
     } else {
       workspace.entityStore.state.update(feature, { selected: false });

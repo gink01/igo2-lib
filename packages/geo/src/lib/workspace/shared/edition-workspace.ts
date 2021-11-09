@@ -86,7 +86,7 @@ export class EditionWorkspace extends Workspace {
     }, 250)
   }
 
-  editionFeature(feature, workspace) {
+  editFeature(feature, workspace) {
     feature.edition = true;
     console.log('edition', feature);
     let id;
@@ -103,7 +103,7 @@ export class EditionWorkspace extends Workspace {
       console.log('edit');
       feature.idkey = id;
       workspace.entityStore.state.update(feature, { selected: true });
-      //TODO EDIT
+
     } else {
       console.log('add');
       feature.new = true;
