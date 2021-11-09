@@ -266,9 +266,10 @@ export class EditionWorkspaceService {
         renderer: rendererType,
         valueAccessor: undefined,
         cellClassFunc: () => {
+          const cellClass = {}
           if (field.type) {
-            const classCss = `class_${field.type}`;
-            return { classCss : true };
+            cellClass[`class_${field.type}`] = true;
+            return cellClass;
         }
         },
         primary: field.primary === true ? true : false,
