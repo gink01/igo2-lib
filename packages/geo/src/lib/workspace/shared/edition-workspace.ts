@@ -28,6 +28,7 @@ export interface EditionWorkspaceOptions extends WorkspaceOptions {
 export class EditionWorkspace extends Workspace {
 
   readonly inResolutionRange$: BehaviorSubject<boolean> = new BehaviorSubject(true);
+  public editionAddFeature$ = new BehaviorSubject<string>(undefined);
 
   get layer(): ImageLayer | VectorLayer { return this.options.layer; }
 
@@ -248,7 +249,8 @@ export class EditionWorkspace extends Workspace {
     setTimeout(() => {
       let element = document.getElementsByClassName('edition-table')[0].getElementsByTagName('tbody')[0]
         .lastElementChild.lastElementChild.firstElementChild.firstElementChild as HTMLElement;
-      element.click();
+      //element.click();
+      this.editionAddFeature$.next(feature);
       this.deactivateDrawControl();
     }, 500);
   }

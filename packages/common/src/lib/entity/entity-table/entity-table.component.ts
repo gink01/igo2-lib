@@ -34,6 +34,7 @@ import { MatFormFieldControl } from '@angular/material/form-field';
 import { FormBuilder, NgControl, NgForm, FormControlName, AbstractControl, FormGroup } from '@angular/forms';
 import { FocusMonitor } from '@angular/cdk/a11y';
 import { ErrorStateMatcher } from '@angular/material/core';
+import { EditionWorkspace } from '@igo2/geo';
 
 const defaultErrors = {
   required: 'Champ obligatoire'
@@ -201,6 +202,7 @@ export class EntityTableComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(private cdRef: ChangeDetectorRef,
     private formBuilder: FormBuilder,
+   private editionWorkspace: EditionWorkspace,
     protected _focusMonitor: FocusMonitor,
     protected _elementRef: ElementRef<HTMLElement>,
     @Optional() @Self() public ngControl: NgControl,
@@ -217,6 +219,9 @@ export class EntityTableComponent implements OnInit, OnChanges, OnDestroy {
   ngOnInit() {
     this.handleDatasource();
     this.dataSource.paginator = this.paginator;
+
+   this.editionWorkspace.editionAddFeature$.subscribe((feature) => { this.enableEdit(feature); });
+
   }
 
   /**
