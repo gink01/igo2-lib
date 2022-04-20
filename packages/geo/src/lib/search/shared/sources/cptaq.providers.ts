@@ -24,7 +24,7 @@ export function cptaqSearchSourceFactory(
 }
 
 /**
- * Function that returns a provider for the Cadastre search source
+ * Function that returns a provider for the Cptaq search source
  */
 export function provideCptaqSearchSource() {
   return {

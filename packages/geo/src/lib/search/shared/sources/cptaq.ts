@@ -15,12 +15,15 @@ import { SearchSourceOptions, TextSearchOptions } from './source.interfaces';
 import { LanguageService, StorageService } from '@igo2/core';
 import { computeTermSimilarity } from '../search.utils';
 import { Cacheable } from 'ts-cacheable';
+
+import { GoogleLinks } from './../../../utils/googleLinks';
+
 /**
  * CPTAQ search source
  */
 @Injectable()
 export class CptaqSearchSource extends SearchSource implements TextSearch {
-  static id = 'CPTAQ';
+  static id = 'cptaq';
   static type = FEATURE;
 
   constructor(
@@ -45,14 +48,15 @@ export class CptaqSearchSource extends SearchSource implements TextSearch {
    */
   protected getDefaultOptions(): SearchSourceOptions {
     return {
-      title: 'CPTAQ (Québec)',
-      searchUrl: 'https://carto.cptaq.gouv.qc.ca/php/find_lot_v1.php?'
+      title: 'Dossiers',
+     // searchUrl: 'https://carto.cptaq.gouv.qc.ca/php/RechercheDossier.php?'
+      searchUrl: 'https://carto-dev.cptaq.local/php/RechercheDossier.php?'
     };
   }
 
   /**
-   * Search a place by name
-   * @param term Place name
+   * Search by file number
+   * @param term File numbere
    * @returns Observable of <SearchResult<Feature>[]
    */
   @Cacheable({
@@ -93,22 +97,32 @@ export class CptaqSearchSource extends SearchSource implements TextSearch {
 
   private extractResults(response: string, term: string): SearchResult<Feature>[] {
     return response
-      .split('<br />')
-      .filter((lot: string) => lot.length > 0)
-      .map((lot: string) => this.dataToResult(lot, term));
+      .split('ZZZ')
+      .filter((dossier: string) => dossier.length > 0)
+      .map((dossier: string) => this.dataToResult(dossier, term));
   }
 
   private dataToResult(data: string, term: string): SearchResult<Feature> {
-    const lot = data.split(';');
-    const numero = lot[0];
-    const wkt = lot[7];
-    const geometry = this.computeGeometry(wkt);
+    const dossier = data.split(';');
+    const numero = dossier[0];
+    const wkt = dossier[9];
+    const geometry:FeatureGeometry = this.computeGeometry(wkt);
+    const resultat = dossier[8];
+    const lienpdf = dossier[10];
+    const gid = dossier[11];
+    const pt:FeatureGeometry = {
+      type: 'Point',
+      coordinates: [dossier[5], dossier[6]]
+    };
 
     const properties = {
-      NoLot: numero,
-      Route: '<span class="routing"> <u>' + this.languageService.translate.instant('igo.geo.seeRouting') + '</u> </span>'
+      Dossier: numero + ' ' + lienpdf,
+      Décision: resultat,
+      GoogleMaps: GoogleLinks.getGoogleMapsCoordLink(pt.coordinates[0], pt.coordinates[1]),
+    //  GoogleStreetView: GoogleLinks.getGoogleStreetViewLink(pt.coordinates[0], pt.coordinates[1]),
+      Routes: '<span class="routing"> <u>' + this.languageService.translate.instant('igo.geo.seeRouting') + '</u> </span>'
     };
-    const id = [this.getId(), 'cptaq', numero].join('.');
+    const id = [this.getId(), 'cptaq', numero, gid].join('.');
 
     return {
       source: this,

@@ -180,7 +180,7 @@ export const environment: Environment = {
         enabled: false
       },
       icherche: {
-        searchUrl: '/apis/icherche',
+        searchUrl: 'https://geoegl.msp.gouv.qc.ca/apis/icherche',
         order: 2,
         enabled: true,
         params: {
@@ -192,12 +192,12 @@ export const environment: Environment = {
       },
       icherchereverse: {
         showInPointerSummary: true,
-        searchUrl: '/apis/terrapi',
+        searchUrl: 'https://geoegl.msp.gouv.qc.ca/apis/terrapi',
         order: 3,
         enabled: true
       },
       ilayer: {
-        searchUrl: '/apis/icherche/layers',
+        searchUrl: 'https://geoegl.msp.gouv.qc.ca/apis/layers/search',
         order: 4,
         enabled: true,
         params: {
